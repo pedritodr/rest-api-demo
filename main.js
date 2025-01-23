@@ -1,138 +1,81 @@
 const express = require('express')
-const bodyParser = require('body-parser')//ques es esto????
 const app = express()
-const port = 3000 //puerto servidor
+const port = 3000
 
-app.use(bodyParser.json());//que es un middleware
-
-//que es la request y el response en rest
-//Status de reponse en rest
-app.get('/version', (req, res) => {
-    res.send({
-        name: 'rest-server',
-        version: '0.0.1',
-        description: "rest-server  for demo"
-    })
-})
-app.get('/user/', (req, res) => {
-    console.log("lista los usuarios...")
+app.get('/products', (req, res) => {
     res.send({
         "users": [
-            {
-                "id": 1,
-                "firstName": "Emily",
-                "lastName": "Johnson",
-                "maidenName": "Smith",
-                "age": 28,
-                "gender": "female",
-                "email": "emily.johnson@x.dummyjson.com",
-                "phone": "+81 965-431-3024",
-                "username": "emilys",
-                "password": "emilyspass",
-                "birthDate": "1996-5-30",
-                "image": "...",
-                "bloodGroup": "O-",
-                "height": 193.24,
-                "weight": 63.16,
-                "eyeColor": "Green",
-                "hair": {
-                    "color": "Brown",
-                    "type": "Curly"
-                },
-                "ip": "42.48.100.32",
-                "address": {
-                    "address": "626 Main Street",
-                    "city": "Phoenix",
-                    "state": "Mississippi",
-                    "stateCode": "MS",
-                    "postalCode": "29112",
-                    "coordinates": {
-                        "lat": -77.16213,
-                        "lng": -92.084824
-                    },
-                    "country": "United States"
-                },
-                "macAddress": "47:fa:41:18:ec:eb",
-                "university": "University of Wisconsin--Madison",
-                "bank": {
-                    "cardExpire": "03/26",
-                    "cardNumber": "9289760655481815",
-                    "cardType": "Elo",
-                    "currency": "CNY",
-                    "iban": "YPUXISOBI7TTHPK2BR3HAIXL"
-                },
-                "company": {
-                    "department": "Engineering",
-                    "name": "Dooley, Kozey and Cronin",
-                    "title": "Sales Manager",
-                    "address": {
-                        "address": "263 Tenth Street",
-                        "city": "San Francisco",
-                        "state": "Wisconsin",
-                        "stateCode": "WI",
-                        "postalCode": "37657",
-                        "coordinates": {
-                            "lat": 71.814525,
-                            "lng": -161.150263
-                        },
-                        "country": "United States"
-                    }
-                },
-                "ein": "977-175",
-                "ssn": "900-590-289",
-                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36",
-                "crypto": {
-                    "coin": "Bitcoin",
-                    "wallet": "0xb9fc2fe63b2a6c003f1c324c3bfa53259162181a",
-                    "network": "Ethereum (ERC20)"
-                },
-                "role": "admin" // or "moderator", or "user"
-            }
-        ]
-    })
-})
-app.post('/user/', (request, response) => {
-    console.log("agrega los usuarios");
-    response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
-})
-
-app.get('/user/:id', (request, response) => {
-    console.log("busca un usuario por id")
-    response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
-})
-
-app.delete('/user/:id', (request, response) => {
-    console.log("elimina un usuario por id")
-    response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
-})
-
-app.put('/user/:id', (request, response) => {
-    console.log("actualiza un usuario por id")
-    response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
-})
-
-app.post('/', (request, response) => {
-    response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
-})
-
-app.get('/clima', async (request, resp) => {
-
-    try {
-        const response = await fetch("https://freetestapi.com/api/v1/weathers");
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
+      {
+        "id": 1,
+        "title": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+        "price": 109.95,
+        "description": "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
+        "category": "men's clothing",
+        "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
+        "rating": {
+          "rate": 3.9,
+          "count": 120
         }
+      },
+      {
+        "id": 2,
+        "title": "Mens Casual Premium Slim Fit T-Shirts ",
+        "price": 22.3,
+        "description": "Slim-fitting style, contrast raglan long sleeve, three-button henley placket, light weight & soft fabric for breathable and comfortable wearing. And Solid stitched shirts with round neck made for durability and a great fit for casual fashion wear and diehard baseball fans. The Henley style round neckline includes a three-button placket.",
+        "category": "men's clothing",
+        "image": "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg",
+        "rating": {
+          "rate": 4.1,
+          "count": 259
+        }
+      },
+      {
+        "id": 3,
+        "title": "Mens Cotton Jacket",
+        "price": 55.99,
+        "description": "great outerwear jackets for Spring/Autumn/Winter, suitable for many occasions, such as working, hiking, camping, mountain/rock climbing, cycling, traveling or other outdoors. Good gift choice for you or your family member. A warm hearted love to Father, husband or son in this thanksgiving or Christmas Day.",
+        "category": "men's clothing",
+        "image": "https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg",
+        "rating": {
+          "rate": 4.7,
+          "count": 500
+        }
+      },
+    ]
+      })
+    })
+    
+    app.get('/products/:id', (req, res) => {
+        res.send({
+          "users": [
+        {
+          "id": 1,
+          "title": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+          "price": 109.95,
+          "description": "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
+          "category": "men's clothing",
+          "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
+          "rating": {
+            "rate": 3.9,
+            "count": 120
+          }
+        }
+      ]
+        })
+      })
 
-        const json = await response.json();
-        resp.send(json)
-        console.log(json);
-    } catch (error) {
-        console.error(error.message);
-    }
-
-})
+      app.post('/products', (req, res) => {
+        res.send('Se ha creado exitosamente.')
+      })  
+    
+      app.put('/products/:id', (req, res) => {
+        res.send('Actualizado exitosamente.!')
+      })
+      app.delete('/products/:id', (req, res) => {
+        res.send('Se ha eliminado correctamente!')
+      })
+     
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+  console.log(`Example app listening on port ${port}`)
 })
-
