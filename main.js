@@ -132,6 +132,88 @@ app.get('/clima', async (request, resp) => {
 
 })
 
+
+// Endpoint de la actividad
+app.get('/products/', (req, res) => {
+    res.send(
+        {
+
+            "products": [ 
+            { 
+                "id": 1, 
+                "title": "Essence Mascara Lash Princess", 
+                "description": "The Essence Mascara Lash Princess is a popular mascara known for its volumizing and lengthening effects.", 
+                "category": "beauty", 
+                "price": 9.99, 
+                "discountPercentage": 7.17, 
+                "rating": 4.94, 
+                "stock": 5, 
+                "tags": ["beauty", "mascara"], 
+                "brand": "Essence", 
+                "sku": "RCH45Q1A", 
+                "weight": 2, 
+                "dimensions": 
+                    { 
+                    "width": 23.17, 
+                    "height": 14.43, 
+                    "depth": 28.01 
+                    }, 
+                "warrantyInformation": "1 month warranty", 
+                "shippingInformation": "Ships in 1 month", 
+                "availabilityStatus": "Low Stock", 
+                "reviews": 
+                [ 
+                    { 
+                        "rating": 2, 
+                        "comment": "Very unhappy with my purchase!" 
+                    }, 
+                    { 
+                        "rating": 5, 
+                        "comment": 
+                        "Very satisfied!" 
+                    } ]
+            
+            } ], 
+            "total": 1, 
+            "skip": 0, 
+            "limit": 30 
+        })
+})
+
+app.get('/products/:id', (req, res) => {
+    res.send(
+        {
+        "product": 
+            { 
+                "id": 1, 
+                "title": "Essence Mascara Lash Princess", 
+                "description": "The Essence Mascara Lash Princess is a popular mascara known for its volumizing and lengthening effects.", 
+                "category": "beauty", 
+                "price": 9.99, 
+                "discountPercentage": 7.17, 
+                "rating": 4.94, 
+                "stock": 5 
+            } 
+        }
+    )
+})
+app.post('/products', (request, response) => {
+    response.send("Creado correctamente");
+})
+app.put('/products/:id', (request, response) => {
+    response.send("Actualizado correctamente");
+})
+app.delete('/products/:id', (request, response) => {
+    response.send("Eliminado correctamente");
+})
+
+
+
+
+
+
+
+
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
