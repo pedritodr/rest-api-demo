@@ -2,6 +2,9 @@ const express = require('express')
 const bodyParser = require('body-parser')//ques es esto????
 const app = express()
 const port = 3000 //puerto servidor
+const fs = require('fs');
+const req = require('express/lib/request');
+const products = JSON.parse(fs.readFileSync('productsDb.json'));
 
 app.use(bodyParser.json());//que es un middleware
 
@@ -134,5 +137,93 @@ app.get('/clima', async (request, resp) => {
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
+})
+
+
+app.get('/products/:id', (request, response) => {
+    console.log("busca un usuario por id")
+ 
+    const productId = parseInt(request.params.id);
+    const product = products.find(product => product.id === productId);
+    response.send(`contenido de request: `, response.json(product || {}));
+})
+
+app.put('/products/:id', (request, response) => {
+    console.log("busca un usuario por id")
+    response.send(`Actualizado correctamente`);
+    const newProductData = request.body;
+    const productId = parseInt(request.params.id);
+    const product = products.findIndex(product => product.id === productId);
+    if (product !== -1) {
+        products[product] = {...products[product], ...newProductData};
+        fs.writeFile('productsDb.json', JSON.stringify(products), (err) => {
+            if (err) {
+              console.error(err);
+              return res.status(500).json({ message: 'Error al actualizar el producto' });
+            }
+      
+
+          });
+        } else {
+          request.status(404).json({ message: 'Producto no encontrado' });
+        }
+      
+        
+    
+    
+})
+
+app.delete('/products/:id', (request, response) => {
+    console.log("busca un usuario por id")
+    response.send(`Eliminado correctamente`);
+    const newProductData = request.body;
+    const productId = parseInt(request.params.id);
+    const product = products.findIndex(product => product.id === productId);
+    if (product !== -1) {
+        products.splice(product, 1);
+        
+        fs.writeFile('productsDb.json', JSON.stringify(products), (err) => {
+            if (err) {
+              console.error(err);
+              return res.status(500).json({ message: 'Error al eliminar el producto' });
+            }
+      
+
+          });
+        } else {
+          request.status(404).json({ message: 'Producto no encontrado' });
+        }
+      
+        
+    
+    
+})
+
+app.post('/products/', (request, response) => {
+    console.log("busca un usuario por id")
+    response.send(`Creado correctamente`);
+    const newProductData = request.body;
+    newProductData.id = products.length + 1;
+    
+    products.push(newProductData);
+    
+    fs.writeFile('productsDb.json', JSON.stringify(products), (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Error al actualizar el producto' });
+        }
+    
+
+        });
+        
+        
+    
+    
+})
+
+
+app.get('/products/', (request, response) => {
+    console.log("buscar todos los usuarios");
+    response.json(products);
 })
 
