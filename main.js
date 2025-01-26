@@ -2,6 +2,9 @@ const express = require('express')
 const bodyParser = require('body-parser')//ques es esto????
 const app = express()
 const port = 3000 //puerto servidor
+const fs = require('fs');
+const req = require('express/lib/request');
+const allstock= JSON.parse(fs.readFileSync('Stock.json'));
 
 app.use(bodyParser.json());//que es un middleware
 
@@ -135,4 +138,96 @@ app.get('/clima', async (request, resp) => {
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
+
+
+
+
+
+app.get('/products/:id', (request, response) => {
+    console.log("busca un usuario por id")
+ 
+    const StockId = parseInt(request.params.id);
+    const items = allstock.find(items => items.id === StockId);
+    response.send(`contenido de request: `, response.json(items || {}));
+})
+
+app.put('/products/:id', (request, response) => {
+    console.log("busca un usuario por id")
+    response.send(`Actualizado correctamente`);
+    const newStock = request.body;
+    const StockId = parseInt(request.params.id);
+    const items = allstock.findIndex(items => items.id === StockId);
+    if (items !== -1) {
+        allstock[items] = {...allstock[items], ...newStock};
+        fs.writeFile('Stock.json', JSON.stringify(allstock), (err) => {
+            if (err) {
+              console.error(err);
+              return res.status(500).json({ message: 'Error al actualizar el producto' });
+            }
+      
+
+          });
+        } else {
+          request.status(404).json({ message: 'Producto no encontrado'});
+        }
+      
+        
+    
+    
+})
+
+app.delete('/products/:id', (request, response) => {
+    console.log("busca un usuario por id")
+    response.send(`Eliminado correctamente`);
+    const newStock = request.body;
+    const StockId = parseInt(request.params.id);
+    const items = allstock.findIndex(items => items.id === StockId);
+    if (items !== -1) {
+        allstock.splice(items, 1);
+        
+        fs.writeFile('Stock.json', JSON.stringify(allstock), (err) => {
+            if (err) {
+              console.error(err);
+              return res.status(500).json({ message: 'Error al eliminar el producto' });
+            }
+      
+
+          });
+        } else {
+          request.status(404).json({ message: 'Producto no encontrado' });
+        }
+      
+        
+    
+    
+})
+
+app.post('/products/', (request, response) => {
+    console.log("busca un usuario por id")
+    response.send(`Creado correctamente`);
+    const newStock = request.body;
+    newStock.id = allstock.length + 1;
+    
+    allstock.push(newStock);
+    
+    fs.writeFile('Stock.json', JSON.stringify(allstock), (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Error al actualizar el producto' });
+        }
+    
+
+        });
+        
+        
+    
+    
+})
+
+
+app.get('/products/', (request, response) => {
+    console.log("buscar todos los usuarios");
+    response.json(allstock);
+})
+
 
