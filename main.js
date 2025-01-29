@@ -1,159 +1,131 @@
-const express = require('express');
-const sequelize = require('./config/database');
-const validateRequest = require('./middlewares/validateRequest');
-const User = require('./models/user')
-const { createUserSchema } = require('./validations/userValidation')
-const bodyParser = require('body-parser')
-// A partir de Express 4.16, no es necesario usar body-parser, 
-// pues podemos usar express.json() y express.urlencoded() directamente.
+const express = require('express')
+const bodyParser = require('body-parser')//ques es esto????
+const app = express()
+const port = 3000 //puerto servidor
 
-const app = express();
+app.use(bodyParser.json());//que es un middleware
 
+//que es la request y el response en rest
+//Status de reponse en rest
+app.get('/version', (req, res) => {
+    res.send({
+        name: 'rest-server',
+        version: '0.0.1',
+        description: "rest-server  for demo"
+    })
+})
+app.get('/user/', (req, res) => {
+    console.log("lista los usuarios...")
+    res.send({
+        "users": [
+            {
+                "id": 1,
+                "firstName": "Emily",
+                "lastName": "Johnson",
+                "maidenName": "Smith",
+                "age": 28,
+                "gender": "female",
+                "email": "emily.johnson@x.dummyjson.com",
+                "phone": "+81 965-431-3024",
+                "username": "emilys",
+                "password": "emilyspass",
+                "birthDate": "1996-5-30",
+                "image": "...",
+                "bloodGroup": "O-",
+                "height": 193.24,
+                "weight": 63.16,
+                "eyeColor": "Green",
+                "hair": {
+                    "color": "Brown",
+                    "type": "Curly"
+                },
+                "ip": "42.48.100.32",
+                "address": {
+                    "address": "626 Main Street",
+                    "city": "Phoenix",
+                    "state": "Mississippi",
+                    "stateCode": "MS",
+                    "postalCode": "29112",
+                    "coordinates": {
+                        "lat": -77.16213,
+                        "lng": -92.084824
+                    },
+                    "country": "United States"
+                },
+                "macAddress": "47:fa:41:18:ec:eb",
+                "university": "University of Wisconsin--Madison",
+                "bank": {
+                    "cardExpire": "03/26",
+                    "cardNumber": "9289760655481815",
+                    "cardType": "Elo",
+                    "currency": "CNY",
+                    "iban": "YPUXISOBI7TTHPK2BR3HAIXL"
+                },
+                "company": {
+                    "department": "Engineering",
+                    "name": "Dooley, Kozey and Cronin",
+                    "title": "Sales Manager",
+                    "address": {
+                        "address": "263 Tenth Street",
+                        "city": "San Francisco",
+                        "state": "Wisconsin",
+                        "stateCode": "WI",
+                        "postalCode": "37657",
+                        "coordinates": {
+                            "lat": 71.814525,
+                            "lng": -161.150263
+                        },
+                        "country": "United States"
+                    }
+                },
+                "ein": "977-175",
+                "ssn": "900-590-289",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36",
+                "crypto": {
+                    "coin": "Bitcoin",
+                    "wallet": "0xb9fc2fe63b2a6c003f1c324c3bfa53259162181a",
+                    "network": "Ethereum (ERC20)"
+                },
+                "role": "admin" // or "moderator", or "user"
+            }
+        ]
+    })
+})
+app.post('/user/', (request, response) => {
+    console.log("agrega los usuarios");
+    response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
+})
 
-// =======================
-// Middlewares
-// =======================
+app.get('/user/:id', (request, response) => {
+    console.log("busca un usuario por id")
+    response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
+})
 
-/**
- * Un middleware es básicamente una función que se ejecuta entre la recepción de la solicitud (request)
- * y el envío de la respuesta (response). Tiene acceso a la solicitud, la respuesta y a la siguiente 
- * función de middleware en la cadena. 
- *
- * Aquí, express.json() se encarga de tomar el cuerpo (body) de las peticiones con formato JSON 
- * y convertirlo en un objeto JavaScript accesible desde req.body.
- */
-app.use(express.json());
-app.use(bodyParser.json());
+app.delete('/user/:id', (request, response) => {
+    console.log("elimina un usuario por id")
+    response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
+})
 
-// =======================
-// Rutas
-// =======================
-/**
- * Las rutas controlan la lógica de negocio para cada endpoint.
- * Por convención, muchos APIs usan rutas en plural (ej. /users) en lugar de /user.
- * Dependerá del criterio o las buenas prácticas de tu proyecto.
- */
+app.put('/user/:id', (request, response) => {
+    console.log("actualiza un usuario por id")
+    response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
+})
 
-app.get('/users', async (req, res) => {
-    console.log('Obtener lista de usuarios');
-    // Aquí iría la lógica para obtener la lista de usuarios desde la base de datos.
-    const users = await User.findAll({
-        where: {
-            isDelete: false,
-        },
-    });
-    res.json({ message: 'Ok', data: users });
-});
+app.post('/', (request, response) => {
+    response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
+})
 
-app.post('/users', validateRequest(createUserSchema), async (req, res) => {
-    console.log('Crear un nuevo usuario');
-
-    // Extraemos datos desde req.body
-    const { name, email, age } = req.body;
+app.get('/clima', async (request, resp) => {
 
     try {
-        const user = await User.findOne({ where: { email, isDelete: false } })
-
-        if (user) res.status(400).json({ message: `Existe un usuario con el email ${email}` })
-
-        const newUser = await User.create({ name, email, age });
-
-        res.json({
-            message: 'Usuario creado exitosamente',
-            data: newUser,
-
-        });
-    } catch (error) {
-        console.log("🚀 ~ app.post ~ error:", error)
-        res.status(400).json({ message: error.message, code: "ERROR" })
-    }
-
-});
-
-app.get('/users/:id', async (req, res) => {
-    console.log('Obtener usuario por ID');
-
-    const { id } = req.params;
-
-    try {
-        if (!id) {
-            res.status(400).json({ message: 'El ID es requerido', code: "ERROR" })
+        const response = await fetch("https://freetestapi.com/api/v1/weathers");
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
         }
 
-        // Lógica para buscar usuario por ID en la base de datos.
-        const user = await User.findOne({ where: { id, isDelete: false } });
-
-        if (!user) {
-            res.status(400).json({ message: `El usuario del ID :${id} no existe`, code: "ERROR" })
-        }
-
-        res.json({
-            message: 'Detalles del usuario',
-            data: user,
-        });
-    } catch (error) {
-        console.log("🚀 ~ app.get ~ error:", error)
-        res.status(400).json({ message: error.message, code: "ERROR" })
-    }
-
-});
-
-app.put('/users/:id', validateRequest(createUserSchema), async (req, res) => {
-    console.log('Actualizar un usuario por ID');
-
-    const { id } = req.params;
-    const { name, email, age } = req.body;
-
-
-    try {
-        if (!id) {
-            res.status(400).json({ message: 'El ID es requerido', code: "ERROR" })
-        }
-
-        // Lógica para buscar usuario por ID en la base de datos.
-        const user = await User.findByPk(id);
-
-        if (!user) {
-            res.status(400).json({ message: `El usuario del ID :${id} no existe`, code: "ERROR" })
-        }
-
-        await User.update({ name, email, age }, { where: { id } });
-
-        res.json({
-            message: 'Usuario actualizado exitosamente',
-        });
-
-    } catch (error) {
-        console.log("🚀 ~ app.put ~ error:", error)
-        res.status(400).json({ message: error.message, code: "ERROR" })
-    }
-});
-
-app.delete('/users/:id', async (req, res) => {
-    console.log('Eliminar un usuario por ID');
-
-    const { id } = req.params;
-    // Lógica para eliminar el usuario de la base de datos.
-    // Ejemplo: await User.destroy({ where: { id } });
-    try {
-        if (!id) {
-            res.status(400).json({ message: 'El ID es requerido', code: "ERROR" })
-        }
-
-        // Lógica para buscar usuario por ID en la base de datos.
-        const user = await User.findOne({ where: { id, isDelete: false } });
-
-        if (!user) {
-            res.status(400).json({ message: `El usuario del ID :${id} no existe`, code: "ERROR" })
-        }
-
-        await User.update({ isDelete: true }, { where: { id } });
-
-        res.json({
-            message: 'Usuario eliminado exitosamente',
-            data: { id },
-        });
-
+        const json = await response.json();
+        resp.send(json)
+        console.log(json);
     } catch (error) {
         console.log("🚀 ~ app.put ~ error:", error)
         res.status(400).json({ message: error.message, code: "ERROR" })
