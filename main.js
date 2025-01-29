@@ -14,6 +14,84 @@ app.get('/version', (req, res) => {
         description: "rest-server  for demo"
     })
 })
+
+
+// 5.1. Respuesta de GET /products  
+app.get('/products/', (req, res) => {
+    console.log("lista de productos...")
+    res.send(      
+        {
+            "products": [
+            {
+            "id": 1,
+            "title": "Essence Mascara Lash Princess",
+            "description": "The Essence Mascara Lash Princess is a popular mascara known for its volumizing and lengthening effects.",
+            "category": "beauty",
+            "price": 9.99,
+            "discountPercentage": 7.17,
+            "rating": 4.94,
+            "stock": 5,
+            "tags": ["beauty", "mascara"],
+            "brand": "Essence",
+            "sku": "RCH45Q1A",
+            "weight": 2,
+            "dimensions": { "width": 23.17, "height": 14.43, "depth": 28.01 },
+            "warrantyInformation": "1 month warranty",
+            "shippingInformation": "Ships in 1 month",
+            "availabilityStatus": "Low Stock",
+            "reviews": [
+            { "rating": 2, "comment": "Very unhappy with my purchase!" },
+            { "rating": 5, "comment": "Very satisfied!" }
+            ]
+            }
+            ],
+            "total": 1,            
+            "skip": 0,
+            "limit": 30
+           }
+)
+})
+
+// 5.2. Respuesta de GET /products/:id
+app.get('/products/:id', (req, res) => {
+    console.log("lista de productos por id...")
+    res.send(    
+        {     
+                "product": {
+                "id": 1,
+                "title": "Essence Mascara Lash Princess",
+                "description": "The Essence Mascara Lash Princess is a popular mascara known for its  volumizing and lengthening effects.",
+                "category": "beauty",
+                "price": 9.99,
+                "discountPercentage": 7.17,
+                "rating": 4.94,
+                "stock": 5
+                }
+            }                
+)
+})
+
+//5.3. Respuesta de POST /products
+app.post('/products/', (request, response) => {
+    console.log("crea los productos");
+    response.send(`"Creado correctamente": ${JSON.stringify(request.body)})}`);
+})
+
+// 5.4. Respuesta de PUT /products/:id
+app.put('/products/:id', (request, response) => {
+    console.log("actualiza un producto por id");
+    response.send(`"Actualizado correctamente": ${JSON.stringify(request.body)})}`);
+})
+
+// 5.5. Respuesta de DELETE /products/:id
+app.delete('/products/:id', (request, response) => {
+    console.log("elimina un producto por id")
+    response.send(`"Eliminado correctamente": ${JSON.stringify(request.body)})}`);
+})
+
+
+
+
 app.get('/user/', (req, res) => {
     console.log("lista los usuarios...")
     res.send({
@@ -91,8 +169,14 @@ app.get('/user/', (req, res) => {
         ]
     })
 })
+
 app.post('/user/', (request, response) => {
     console.log("agrega los usuarios");
+    response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
+})
+
+app.put('/user/:id', (request, response) => {
+    console.log("actualiza un usuario por id")
     response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
 })
 
@@ -106,14 +190,10 @@ app.delete('/user/:id', (request, response) => {
     response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
 })
 
-app.put('/user/:id', (request, response) => {
-    console.log("actualiza un usuario por id")
-    response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
-})
-
 app.post('/', (request, response) => {
     response.send(`contenido de request: ${JSON.stringify(request.body)})}`);
 })
+
 
 app.get('/clima', async (request, resp) => {
 
