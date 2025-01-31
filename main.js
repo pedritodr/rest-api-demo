@@ -3,6 +3,8 @@ const sequelize = require('./config/database');
 const validateRequest = require('./middlewares/validateRequest');
 const User = require('./models/user')
 const { createUserSchema } = require('./validations/userValidation')
+const Producto = require("./models/Producto")
+const { createProductoSchema } = require('./validations/Validacion_Productos')
 const bodyParser = require('body-parser')
 // A partir de Express 4.16, no es necesario usar body-parser, 
 // pues podemos usar express.json() y express.urlencoded() directamente.
@@ -161,6 +163,146 @@ app.delete('/users/:id', async (req, res) => {
 
 
 });
+
+
+
+//Tarea Modulo III///////////////////////////////////////////////////////////////////////////////////
+
+
+// Obtener lista de productos
+app.get('/productos', async (req, res) => {
+    console.log('Obtener la lista de productos');
+    
+    const Productos = await Producto.findAll({
+        where: {
+            isDelete: false,
+        },
+    });
+    res.json({ message: 'Ok', data: Productos });
+});
+
+// Crear un nuevo producto
+app.post('/productos', validateRequest(createProductoSchema), async (req, res) => {
+    console.log('Crear un nuevo Producto');
+
+    const { Nombre,Precio} = req.body;
+    
+    try {
+
+        const existeProducto = await Producto.findOne({ where: {Nombre} });
+
+        if (existeProducto) {
+            return res.status(400).json({ error: "El nombre del Producto ya existe" });
+        }
+
+        const newProducto = await Producto.create({ Nombre,Precio});
+
+        res.json({
+            message: 'Producto creado correctamente',
+            data: newProducto,
+
+        });
+    } catch (error) {
+        console.log("🚀 ~ app.post ~ error:", error)
+        res.status(400).json({ message: error.message, code: "ERROR" })
+    }
+
+});
+
+// Obtener un solo producto por ID
+app.get('/productos/:id', async (req, res) => {
+    console.log('Obtener Producto por ID');
+
+    const { id } = req.params;
+    
+    try {
+        if (!id) {
+            res.status(400).json({ message: 'El ID del Producto es requerido', code: "ERROR" })
+        }
+
+        const Productos = await Producto.findOne({ where: { id, isDelete: false } });
+
+        if (!Productos) {
+            res.status(400).json({ message: `El Producto del ID :${id} no existe`, code: "ERROR" })
+        }
+
+        res.json({
+            message: 'Detalles del producto',
+            data: Productos,
+        });
+    } catch (error) {
+        console.log("🚀 ~ app.get ~ error:", error)
+        res.status(400).json({ message: error.message, code: "ERROR" })
+    }
+
+});
+
+// Actualizar un producto por ID
+app.put('/productos/:id', validateRequest(createProductoSchema), async (req, res) => {
+    console.log('Actualizar un Producto por ID');
+
+    const { id } = req.params;
+
+    const { Nombre, Precio } = req.body;
+    
+    try {
+        if (!id) {
+            res.status(400).json({ message: 'El ID del Producto es requerido', code: "ERROR" })
+        }
+
+        const Productos = await Producto.findByPk(id);
+
+        if (!Productos) {
+            res.status(400).json({ message: `El Producto del ID :${id} no existe`, code: "ERROR" })
+        }
+
+        await Producto.update({ Nombre, Precio}, { where: { id } });
+
+        res.json({
+            message: 'Producto actualizado correctamente',
+        });
+
+    } catch (error) {
+        console.log("🚀 ~ app.put ~ error:", error)
+        res.status(400).json({ message: error.message, code: "ERROR" })
+    }
+});
+
+// Eliminar un producto por ID 
+app.delete('/productos/:id', async (req, res) => {
+
+    console.log('Eliminar un Producto por ID');
+
+    const { id } = req.params;
+    
+    try {
+        if (!id) {
+            res.status(400).json({ message: 'El ID del Producto es requerido', code: "ERROR" })
+        }
+
+        const Productos = await Producto.findOne({ where: { id, isDelete: false } });
+
+        if (!Productos) {
+            res.status(400).json({ message: `El Producto del ID :${id} no existe`, code: "ERROR" })
+        }
+
+        await Producto.update({ isDelete: true }, { where: { id } });
+
+        res.json({
+            message: 'Producto eliminado exitosamente',
+            data: { id },
+        });
+
+    } catch (error) {
+        console.log("🚀 ~ app.put ~ error:", error)
+        res.status(400).json({ message: error.message, code: "ERROR" })
+    }
+
+});
+
+
+
+
 
 // =======================
 // Inicializar servidor
