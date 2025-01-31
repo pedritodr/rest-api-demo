@@ -1,11 +1,14 @@
 const express = require('express');
 const sequelize = require('./config/database');
 const validateRequest = require('./middlewares/validateRequest');
-const User = require('./models/user')
-const { createUserSchema } = require('./validations/userValidation')
+const User = require('./models/user');
+const Products = require('./models/products');
+const { createUserSchema } = require('./validations/userValidation');
+const { createProducts14209140 } = require('./validations/productsValidation');
 const bodyParser = require('body-parser')
 // A partir de Express 4.16, no es necesario usar body-parser, 
 // pues podemos usar express.json() y express.urlencoded() directamente.
+const { queryInterface } = sequelize;
 
 const app = express();
 
@@ -162,6 +165,134 @@ app.delete('/users/:id', async (req, res) => {
 
 });
 
+
+app.get('/products', async (req, res) => {
+
+    console.log('Obtener lista de productos');
+    const products = await Products.findAll({
+        where: {
+            isDelete: false,
+        },
+    });
+    res.json({ message: 'Ok', data: products });
+});
+
+app.get('/products/:id', async (req, res) => {
+    console.log('Obtener producto por ID');
+
+    const { id } = req.params;
+
+    try {
+        if (!id) {
+            res.status(400).json({ message: 'El ID es requerido', code: "ERROR" })
+        }
+
+        // Lógica para buscar producto por ID en la base de datos.
+        const producto = await Products.findOne({ where: { id, isDelete: false } });
+
+        if (!producto) {
+            res.status(400).json({ message: `El producto del ID :${id} no existe`, code: "ERROR" })
+        }
+
+        res.json({
+            message: 'Detalles del producto',
+            data: producto,
+        });
+    } catch (error) {
+        console.log("🚀 ~ app.get ~ error:", error)
+        res.status(400).json({ message: error.message, code: "ERROR" })
+    }
+
+});
+
+app.post('/products', validateRequest(createProducts14209140), async (req, res) => {
+    console.log('Crear un nuevo producto');
+
+    const { name, type, stock } = req.body;
+
+    try {
+        const product = await Products.findOne({ where: { name, isDelete: false } })
+
+        if (product) res.status(400).json({ message: `Existe un producto con el nombre ${name}` })
+
+        const newProducts = await Products.create({ name, type, stock });
+
+        res.json({
+            message: 'Creado correctamente',
+            data: newProducts,
+
+        });
+    } catch (error) {
+        console.log("🚀 ~ app.post ~ error:", error)
+        res.status(400).json({ message: error.message, code: "ERROR" })
+    }
+
+});
+
+app.put('/products/:id', validateRequest(createProducts14209140), async (req, res) => {
+    console.log('Actualizar un producto por ID');
+
+    const { id } = req.params;
+    const { name, type, stock } = req.body;
+
+
+    try {
+        if (!id) {
+            res.status(400).json({ message: 'El ID es requerido', code: "ERROR" })
+        }
+
+        // Lógica para buscar produxto por ID en la base de datos.
+        const products = await Products.findByPk(id);
+
+        if (!products) {
+            res.status(400).json({ message: `El producto del ID :${id} no existe`, code: "ERROR" })
+        }
+
+        await Products.update({ name, type, stock }, { where: { id } });
+
+        res.json({
+            message: 'Actualizado correctamente',
+        });
+
+    } catch (error) {
+        console.log("🚀 ~ app.put ~ error:", error)
+        res.status(400).json({ message: error.message, code: "ERROR" })
+    }
+});
+
+app.delete('/products/:id', async (req, res) => {
+    console.log('Eliminar un producto por ID');
+
+    const { id } = req.params;
+    // // Lógica para eliminar el producto de la base de datos.
+    // // Ejemplo: await User.destroy({ where: { id } });
+    try {
+        if (!id) {
+            res.status(400).json({ message: 'El ID es requerido', code: "ERROR" })
+        }
+
+        // Lógica para buscar producto por ID en la base de datos.
+        const product = await Products.findOne({ where: { id, isDelete: false } });
+
+        if (!product) {
+            res.status(400).json({ message: `El producto del ID :${id} no existe`, code: "ERROR" })
+        }
+
+        await Products.update({ isDelete: true }, { where: { id } });
+
+        res.json({
+            message: 'Eliminado correctamente',
+            data: { id },
+        });
+    
+    } catch (error) {
+        console.log("🚀 ~ app.put ~ error:", error)
+        res.status(400).json({ message: error.message, code: "ERROR" })
+    }
+
+
+});
+
 // =======================
 // Inicializar servidor
 // =======================
@@ -175,6 +306,7 @@ const PORT = process.env.PORT_APP || 3000;
  * Luego, iniciamos el servidor Express escuchando en el puerto definido.
  */
 sequelize.sync()
+// sequelize.sync({ alter: true })
     .then(() => {
         console.log('Base de datos sincronizada correctamente');
         app.listen(PORT, () => {

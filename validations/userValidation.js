@@ -21,7 +21,6 @@ const createUserSchema = yup
     // Prohibimos campos no definidos
     .noUnknown(true, 'Solo se permiten los campos "name", "email" y "age"');
 
-
 module.exports = {
     createUserSchema
 };
